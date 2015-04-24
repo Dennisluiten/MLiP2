@@ -1,7 +1,5 @@
 package main;
 
-import java.io.IOException;
-
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.BayesNet;
 import weka.core.Attribute;
@@ -38,8 +36,12 @@ public class Main {
 			classifier = (Classifier)SerializationHelper.read("resources\\classifier.model");
 		}
 		if(test){
-			//TODO
+			
 		}
+	}
+	
+	private void createSubmissionFile(){
+		//TODO
 	}
 	
 	private void declareFeatureVector(){

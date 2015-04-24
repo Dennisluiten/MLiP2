@@ -13,7 +13,6 @@ public class MyFileReader {
 	private File file;
 	private BufferedReader reader;
 	private Main main;
-	public final static String CONTENT = "content", CLASSIFICATION = "classifications";
 	
 	public MyFileReader (String testOrTrain, Main main) throws IOException{
 		this.main = main;
@@ -31,7 +30,7 @@ public class MyFileReader {
 		Instance instance = new Instance(94);
 		String nextLine = reader.readLine();
 //		System.out.println(nextLine);
-		if(nextLine != null){
+//		if(nextLine != null){
 			String [] ss = nextLine.split(",");
 			for(int i= 1; i< 94; i++){
 				//System.out.println(i + ": " + ss[i]);
@@ -40,10 +39,24 @@ public class MyFileReader {
 			}
 			instance.setValue((Attribute) main.wekaAttributes.elementAt(0), ss[94]);
 
-		}
-		else{
-			System.out.println("End of File reached.");
-		}
+//		}
+//		else{System.out.println("End of File reached.");}
+		return instance;
+	}
+	
+	public Instance readInstanceTest() throws IOException{
+		Instance instance = new Instance(94);
+		String nextLine = reader.readLine();
+//		System.out.println(nextLine);
+//		if(nextLine != null){
+			String [] ss = nextLine.split(",");
+			for(int i= 1; i< 94; i++){
+				//System.out.println(i + ": " + ss[i]);
+				instance.setValue((Attribute) main.wekaAttributes.elementAt(i), Integer.parseInt(ss[i]));
+
+			}
+//		}
+//		else{System.out.println("End of File reached.");}
 		return instance;
 	}
 
