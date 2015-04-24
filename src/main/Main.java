@@ -1,5 +1,8 @@
 package main;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.BayesNet;
 import weka.core.Attribute;
@@ -49,11 +52,47 @@ public class Main {
 			System.out.println("Classification int:  "+ classifications[i]);
 		
 			}
+			createSubmissionFile(classifications);
 		}
+		
 	}
 	
-	private void createSubmissionFile(){
-		//TODO
+	private void createSubmissionFile(int[] results) throws IOException{
+		System.out.println("Submission file");
+		FileWriter writer = new FileWriter("resources\\submission.csv");
+		createCSVHeaders(writer);
+		int counter = 1;
+		for (int result : results)
+		{ //Todo, id, 1 en 
+			writer.append(counter + ",");
+			for (int j = 1; j < 10; j++)
+			{
+				if (j == result)
+					writer.append("1");
+				else
+					writer.append("0");	
+				if (j < 9)
+					writer.append(",");
+			}
+			writer.append("\n");
+			counter++;
+		}
+		writer.flush();
+		writer.close();
+		System.out.println("Done");
+		
+	}
+	
+	private void createCSVHeaders(FileWriter fw) throws IOException
+	{
+		fw.append("id,");
+		for (int i = 1; i < 10; i++)
+		{
+			fw.append("Class_" + i);
+			if(i < 9)
+				fw.append(",");
+		}
+		fw.append("\n");
 	}
 	
 	private void declareFeatureVector(){
