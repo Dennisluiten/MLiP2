@@ -4,7 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import weka.classifiers.Classifier;
-import weka.classifiers.bayes.BayesNet;
+import weka.classifiers.trees.REPTree;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
@@ -14,9 +14,11 @@ import weka.core.SerializationHelper;
 public class Main {
 	private MyFileReader fr;
 	public  FastVector wekaAttributes = new FastVector(94);
-	private Instances trainSet, testSet;
-	private boolean train = false, test = true;
+	private Instances trainSet;
+	private boolean train = true, test = true;
 	private Classifier classifier;
+	FileWriter writer = new FileWriter("resources\\submission.csv");
+
 	
 	public static void main(String[] args) throws Exception {
 		new Main();
@@ -28,6 +30,7 @@ public class Main {
 		trainSet = new Instances ("Rel", wekaAttributes, 61878);
 		trainSet.setClassIndex(0);
 		if(train){
+			System.out.println("Start training.");
 			fr = new MyFileReader("train", this);	
 
 			for(int i = 0; i < 61878; i++){
@@ -35,64 +38,61 @@ public class Main {
 				trainSet.add(fr.readInstanceTrain());
 			}
 
-			classifier = new BayesNet();
+			
+			classifier = new REPTree();
 			classifier.buildClassifier(trainSet);
+			System.out.println("Saving model");
 			SerializationHelper.write("resources\\classifier.model", classifier);
+			System.out.println("Model saved");
 		}else{
 			classifier = (Classifier)SerializationHelper.read("resources\\classifier.model");
 		}
 		if(test){
+			System.out.println("Start Testing.");
 			fr = new MyFileReader("test", this);
-			int [] classifications = new int [144368];
-			testSet = new Instances("Rel", wekaAttributes, 144368);
-			for(int i = 0; i < 144368; i++){
-			Instance instance = fr.readInstanceTest();
-			instance.setDataset(trainSet);
-			classifications[i] = (int) classifier.classifyInstance(instance)+1;
-			System.out.println("Classification int:  "+ classifications[i]);
-		
-			}
-			createSubmissionFile(classifications);
-		}
-		
-	}
-	
-	private void createSubmissionFile(int[] results) throws IOException{
-		System.out.println("Submission file");
-		FileWriter writer = new FileWriter("resources\\submission.csv");
-		createCSVHeaders(writer);
-		int counter = 1;
-		for (int result : results)
-		{ //Todo, id, 1 en 
-			writer.append(counter + ",");
-			for (int j = 1; j < 10; j++)
-			{
-				if (j == result)
-					writer.append("1");
-				else
-					writer.append("0");	
-				if (j < 9)
-					writer.append(",");
-			}
-			writer.append("\n");
-			counter++;
+			double [] classification = new double [9];
+			//			testSet = new Instances("Rel", wekaAttributes, 144368);
+			createCSVHeaders();
+			for(int i = 1; i < 144369; i++){
+				Instance instance = fr.readInstanceTest();
+				instance.setDataset(trainSet);
+				classification = classifier.distributionForInstance(instance);
+				createSubmissionFile(classification, i);
+				if(i%1000 == 0)
+					System.out.println("Classifying Nr: " + i);
+
+			}	
 		}
 		writer.flush();
 		writer.close();
 		System.out.println("Done");
-		
+	}
+
+	private void createSubmissionFile(double [] results, int i) throws IOException{
+		writer.append(i+ ",");
+		for (int j = 0; j < 9; j++)
+		{
+//			System.out.println("Current value: "+ results [j]);
+			writer.append(results[j]+ "");	
+			if (j < 8){
+				writer.append(",");
+//				System.out.println("Appending ','");
+			}
+		}	
+		writer.append("\n");
+
 	}
 	
-	private void createCSVHeaders(FileWriter fw) throws IOException
+	private void createCSVHeaders() throws IOException
 	{
-		fw.append("id,");
+		writer.append("id,");
 		for (int i = 1; i < 10; i++)
 		{
-			fw.append("Class_" + i);
+			writer.append("Class_" + i);
 			if(i < 9)
-				fw.append(",");
+				writer.append(",");
 		}
-		fw.append("\n");
+		writer.append("\n");
 	}
 	
 	private void declareFeatureVector(){
