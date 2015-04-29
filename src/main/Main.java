@@ -12,11 +12,13 @@ import weka.core.Instances;
 import weka.core.SerializationHelper;
 
 public class Main {
+	
+	private Classifier classifier = new REPTree();
+
 	private MyFileReader fr;
 	public  FastVector wekaAttributes = new FastVector(94);
 	private Instances trainSet;
 	private boolean train = true, test = true;
-	private Classifier classifier;
 	FileWriter writer = new FileWriter("resources\\submission.csv");
 
 	
@@ -39,7 +41,6 @@ public class Main {
 			}
 
 			
-			classifier = new REPTree();
 			classifier.buildClassifier(trainSet);
 			System.out.println("Saving model");
 			SerializationHelper.write("resources\\classifier.model", classifier);
