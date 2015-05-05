@@ -2,9 +2,11 @@ package main;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import weka.classifiers.Classifier;
-import weka.classifiers.trees.REPTree;
+import weka.classifiers.bayes.BayesNet;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
@@ -13,8 +15,9 @@ import weka.core.SerializationHelper;
 
 public class Main {
 	
-	private Classifier classifier = new REPTree();
+	private Classifier classifier = new BayesNet();
 
+	final int NRTRAINDATA = 61878, NRTESTDATA = 144368;
 	private MyFileReader fr;
 	public  FastVector wekaAttributes = new FastVector(94);
 	private Instances trainSet;
@@ -23,24 +26,29 @@ public class Main {
 
 	
 	public static void main(String[] args) throws Exception {
+		Calendar cal = Calendar.getInstance();
+    	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+    	String start = sdf.format(cal.getTime());
 		new Main();
-		System.out.println("Processes finished.");
+		System.out.println("Process started  at: " + start);
+		cal = Calendar.getInstance();
+    	System.out.println("Process finished at: " + sdf.format(cal.getTime()) );
 	}
 	
 	public Main () throws Exception{
 		declareFeatureVector();
-		trainSet = new Instances ("Rel", wekaAttributes, 61878);
+		trainSet = new Instances ("Rel", wekaAttributes, NRTRAINDATA);
 		trainSet.setClassIndex(0);
 		if(train){
 			System.out.println("Start training.");
 			fr = new MyFileReader("train", this);	
 
-			for(int i = 0; i < 61878; i++){
+			for(int i = 0; i < NRTRAINDATA; i++){
 				//System.out.println("INstance nr: " + i);
 				trainSet.add(fr.readInstanceTrain());
 			}
 
-			
+			System.out.println("Building Classifier");
 			classifier.buildClassifier(trainSet);
 			System.out.println("Saving model");
 			SerializationHelper.write("resources\\classifier.model", classifier);
@@ -54,7 +62,7 @@ public class Main {
 			double [] classification = new double [9];
 			//			testSet = new Instances("Rel", wekaAttributes, 144368);
 			createCSVHeaders();
-			for(int i = 1; i < 144369; i++){
+			for(int i = 1; i <= NRTESTDATA; i++){
 				Instance instance = fr.readInstanceTest();
 				instance.setDataset(trainSet);
 				classification = classifier.distributionForInstance(instance);
@@ -66,7 +74,6 @@ public class Main {
 		}
 		writer.flush();
 		writer.close();
-		System.out.println("Done");
 	}
 
 	private void createSubmissionFile(double [] results, int i) throws IOException{
