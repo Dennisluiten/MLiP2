@@ -9,9 +9,8 @@ import java.io.IOException;
 
 public class Normalizer {
 
-	final boolean TRAIN = true;
+	final boolean TRAIN = false;
 
-	
 	final int NRTRAINDATA = 61878, NRTESTDATA = 144368, NRFEAT = 94;
 	int sizeData;
 	File oldFile;
@@ -22,11 +21,14 @@ public class Normalizer {
 	String [] classData;
 	
 	public static void main(String[] args) throws IOException {
-		System.out.println("Starting Normalization process.");
+		System.out.println("Starting Normalization process. Between 0-1");
 		Normalizer n = new Normalizer();
 		n.readData();
 		n.normalize();
-		n.writeData;
+		n.writeIDs();
+		n.writeData();
+		System.out.println("Finished Normalization process.");
+		
 	}
 	
 	public Normalizer() throws IOException{
@@ -48,7 +50,7 @@ public class Normalizer {
 		
 		try {
 			reader = new BufferedReader(new FileReader(oldFile));
-			fw.write(reader.readLine());
+			fw.write(reader.readLine() + "\n");
 			
 		} catch (FileNotFoundException e) {
 			System.out.println("Er is geen file te vinden.");
@@ -85,7 +87,28 @@ public class Normalizer {
 		}
 	}
 	
-	private void writeData(){
+	private void writeIDs(){
+		for(int id = 1; id < sizeData; id++){
+			newData[id-1][0] = id;
+		}
+	}
+	
+	private void writeData() throws IOException{
+		for(int d = 0; d < sizeData; d++){
+			for(int f = 0; f < NRFEAT; f++){
+				fw.write(newData[d][f]+ "");
+				if(f < NRFEAT - 1){
+					fw.write(",");
+				}
+				fw.flush();
+			}
+			if(TRAIN){
+				fw.write("," + classData[d]);
+			}
+			fw.write("\n");
+		}
+		fw.flush();
+		fw.close();
 		
 	}
 	

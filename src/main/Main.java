@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import weka.classifiers.Classifier;
-import weka.classifiers.bayes.BayesNet;
+import weka.classifiers.lazy.KStar;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
@@ -15,7 +15,7 @@ import weka.core.SerializationHelper;
 
 public class Main {
 	
-	private Classifier classifier = new BayesNet();
+	private Classifier classifier = new KStar();
 
 	final int NRTRAINDATA = 61878, NRTESTDATA = 144368;
 	private MyFileReader fr;

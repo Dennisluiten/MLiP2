@@ -9,10 +9,13 @@ import java.io.IOException;
 
 public class Threshold {
 
-	private File file;
+	final int NRTESTDATA = 144368;
+	private File oldFile = new File("resources\\submission-KStar-dist.csv");
+	private String newFile = "resources\\submissionthreshold.csv";
 	private BufferedReader reader;
+	final double THRESHOLD = 0.9;
 	
-	FileWriter writer = new FileWriter("resources\\submissionthreshold.csv");
+	FileWriter writer;
 	
 	public static void main(String[] args) throws Exception {
 		new Threshold();
@@ -20,9 +23,9 @@ public class Threshold {
 	}
 	
 	public Threshold() throws IOException{
-		file = new File("resources\\submission-KStar-dist.csv");
+		writer = new FileWriter(newFile);
 		try {
-			reader = new BufferedReader(new FileReader(file));
+			reader = new BufferedReader(new FileReader(oldFile));
 			System.out.println(reader.readLine());
 		} catch (FileNotFoundException e) {
 			System.out.println("Er is geen file te vinden.");
@@ -30,19 +33,24 @@ public class Threshold {
 		}
 		createCSVHeaders();
 		
-		createSubmissionFile( iets ,i);
+		for(int id= 0; id < NRTESTDATA; id++){
+			
+		}
+		
+		//TODO
+		//createSubmissionFile( iets ,i);
 	}
 	
-	private void createSubmissionFile(double [] results, int i) throws IOException{
+	private void writeData(double [] results, int i) throws IOException{
 		writer.append(i+ ",");
-		boolean threshold = false;
+		boolean aboveThreshold = false;
 		for (int j = 0; j < 9; j++){
-			if (results[j] >= 0.97)
-				threshold = true; 
+			if (results[j] >= THRESHOLD)
+				aboveThreshold = true; 
 		}
-		if (threshold){
+		if (aboveThreshold){
 			for(int l = 0; l < 9; l++){
-				if(results[l] < 0.97)
+				if(results[l] < THRESHOLD)
 					writer.append("0");
 				else
 					writer.append("1");
