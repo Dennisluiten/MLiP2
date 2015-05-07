@@ -9,15 +9,17 @@ import java.io.IOException;
 
 public class Threshold {
 
+	final double THRESHOLD = 0.97;
+
 	final int NRTESTDATA = 144368;
 	private File oldFile = new File("resources\\submission-KStar-dist.csv");
-	private String newFile = "resources\\submissionthreshold.csv";
+	private String newFile = "resources\\submission-KStar-threshold"+ THRESHOLD + ".csv";
 	private BufferedReader reader;
-	final double THRESHOLD = 0.9;
 	
 	FileWriter writer;
 	
 	public static void main(String[] args) throws Exception {
+		System.out.println("Starting Threshold adjustment.");
 		new Threshold();
 		System.out.println("Processes finished.");
 	}
@@ -33,12 +35,16 @@ public class Threshold {
 		}
 		createCSVHeaders();
 		
-		for(int id= 0; id < NRTESTDATA; id++){
-			
+		for(int id = 1; id <= NRTESTDATA; id++){
+			String [] ss = reader.readLine().split(",");
+			double [] ds = new double [9];
+			for(int c = 1; c <=9; c++){
+				ds[c-1] = Double.parseDouble(ss[c]);
+			}
+			writeData(ds, id);
 		}
-		
-		//TODO
-		//createSubmissionFile( iets ,i);
+		writer.flush();
+		writer.close();
 	}
 	
 	private void writeData(double [] results, int i) throws IOException{
